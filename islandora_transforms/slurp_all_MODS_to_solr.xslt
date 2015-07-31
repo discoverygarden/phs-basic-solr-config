@@ -174,8 +174,6 @@
     <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
-    <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'" />
-    <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '" />
 
     <xsl:variable name="base_prefix">
       <xsl:value-of select="concat($prefix, local-name(), '_')"/>
