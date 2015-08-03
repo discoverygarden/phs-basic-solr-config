@@ -183,6 +183,7 @@
       <xsl:if test="@displayLabel">
         <xsl:value-of select="concat(translate(@displayLabel, ' ', '_'), '_')"/>
       </xsl:if>
+      <xsl:text>mods_relatedItem_displaylabel_href</xsl:text>
     </xsl:variable>
 
     <xsl:call-template name="general_mods_field">
@@ -194,6 +195,8 @@
       <xsl:with-param name="node" select="."/>
     </xsl:call-template>
   </xsl:template>
+
+  <xsl:variable name="field_name" select="mods_relatedItem_displaylabel_href"/>
 
   <!-- Fields are duplicated for authority because searches across authorities are common. -->
   <xsl:template name="mods_authority_fork">
