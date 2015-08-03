@@ -183,7 +183,7 @@
       <xsl:if test="@displayLabel">
         <xsl:value-of select="concat(translate(@displayLabel, ' ', '_'), '_')"/>
       </xsl:if>
-      <xsl:text>mods_relatedItem_displaylabel_href</xsl:text>
+      <xsl:text>href_</xsl:text>
     </xsl:variable>
 
     <xsl:call-template name="general_mods_field">
