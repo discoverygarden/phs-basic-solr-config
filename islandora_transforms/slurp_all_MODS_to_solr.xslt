@@ -196,8 +196,6 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:variable name="field_name" select="mods_relatedItem_displaylabel_href"/>
-
   <!-- Fields are duplicated for authority because searches across authorities are common. -->
   <xsl:template name="mods_authority_fork">
     <xsl:param name="prefix"/>
