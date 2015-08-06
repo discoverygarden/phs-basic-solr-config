@@ -5,7 +5,8 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:mods="http://www.loc.gov/mods/v3"
-     exclude-result-prefixes="mods java">
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+     exclude-result-prefixes="mods java xlink">
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>-->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/> -->
@@ -167,6 +168,34 @@
     </xsl:call-template>
   </xsl:template>
 
+  <!-- Index the xlink:href -->
+  <xsl:template match="mods:relatedItem[@xlink:href]" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:variable name="base_prefix">
+      <xsl:value-of select="concat($prefix, local-name(), '_')"/>
+      <xsl:if test="@type">
+        <xsl:value-of select="concat(translate(@type, ' ', '_'), '_')"/>
+      </xsl:if>
+      <xsl:if test="@displayLabel">
+        <xsl:value-of select="concat(translate(@displayLabel, ' ', '_'), '_')"/>
+      </xsl:if>
+      <xsl:text>href_</xsl:text>
+    </xsl:variable>
+
+    <xsl:call-template name="general_mods_field">
+      <xsl:with-param name="prefix" select="$base_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space(@xlink:href)"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+      <xsl:with-param name="node" select="."/>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- Fields are duplicated for authority because searches across authorities are common. -->
   <xsl:template name="mods_authority_fork">
     <xsl:param name="prefix"/>
@@ -200,7 +229,7 @@
     </xsl:if>
   </xsl:template>
 
-   <!-- Want to include language in field names. -->
+  <!-- Want to include language in field names. -->
   <xsl:template name="mods_language_fork">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
