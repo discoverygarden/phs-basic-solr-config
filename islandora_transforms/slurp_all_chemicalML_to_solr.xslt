@@ -17,6 +17,7 @@
     <!-- Clearing hash in case the template is ran more than once. -->
     <xsl:variable name="return_from_clear" select="java:clear($single_valued_hashset_for_cml)"/>
     <xsl:apply-templates mode="writing_cml" select="$content//cmls:module"/>
+    <xsl:apply-templates mode="slurping_cml" select="$content//cmls:metadataList[@convention = 'islandora:sp_chem_CM']"/>
   </xsl:template>
 
   <!-- Match on individual fields. -->
@@ -183,21 +184,27 @@
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:scalar[@dictRef="x:S2A"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">s2a_f</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 's2a_f')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">s2a_f</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:scalar[@dictRef="x:S2-1"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">s21_f</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 's21_f')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">s21_f</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:scalar[@dictRef="x:S2"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">s2_f</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 's2_f')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">s2_f</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:scalar[@dictRef="g:zmat"]' mode="writing_cml">
@@ -209,39 +216,51 @@
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.yz"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_yz_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_yz_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_yz_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.xz"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_xz_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_xz_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_xz_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.xy"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_xy_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_xy_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_xy_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.zz"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_zz_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_zz_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_zz_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.yy"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_yy_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_yy_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_yy_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="g:spindipole.xx"]' mode="writing_cml">
-    <xsl:apply-templates mode="writing_cml_field" select=".">
-      <xsl:with-param name="field_name">spindipole_xx_s</xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:if test="java:add($single_valued_hashset_for_cml, 'spindipol_xx_s')">
+      <xsl:apply-templates mode="writing_cml_field" select=".">
+        <xsl:with-param name="field_name">spindipole_xx_s</xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match='//cmls:module/cmls:list/cmls:array[@dictRef="cc:coupling"]' mode="writing_cml">
@@ -700,5 +719,55 @@
   <!-- Avoid using text alone. -->
   <xsl:template match="text()" mode="writing_cml"/>
   <xsl:template match="text()" mode="writing_cml_field"/>
+
+  <!-- SLURP MODS Metadata -->
+  <xsl:template match="*" mode="slurping_cml">
+    <xsl:param name="prefix" select="'cml_molecule_'"></xsl:param>
+    <xsl:param name="suffix" select="'ms'"/>
+    <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'" />
+    <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '" />
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, local-name(), '_')"/>
+      <xsl:if test="@type">
+        <xsl:value-of select="concat(@type, '_')"/>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="textValue">
+      <xsl:value-of select="normalize-space(text())"/>
+    </xsl:variable>
+
+    <xsl:if test="$textValue">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($this_prefix, $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$textValue"/>
+      </field>
+      <!-- Fields are duplicated for authority because searches across authorities are common. --> 
+      <xsl:if test="@authority">
+        <field>
+          <xsl:attribute name="name">
+            <xsl:value-of select="concat($this_prefix, 'authority_', translate(@authority, $uppercase, $lowercase), '_', $suffix)"/>
+          </xsl:attribute>
+          <xsl:value-of select="$textValue"/>
+        </field>
+      </xsl:if>
+    </xsl:if>
+
+    <xsl:apply-templates mode="slurping_cml">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+    </xsl:apply-templates>
+    <xsl:if test="@authority">
+      <xsl:apply-templates mode="slurping_cml">
+        <xsl:with-param name="prefix" select="concat($this_prefix, 'authority_', translate(@authority, $uppercase, $lowercase), '_')"/>
+        <xsl:with-param name="suffix" select="$suffix"/>
+      </xsl:apply-templates>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Avoid using text alone. -->
+  <xsl:template match="text()" mode="slurping_cml"/>
 
 </xsl:stylesheet>
