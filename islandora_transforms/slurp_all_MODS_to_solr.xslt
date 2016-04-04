@@ -37,16 +37,26 @@
     </xsl:apply-templates>
   </xsl:template>
   
+  <xsl:template match="*" mode="slurping_MODS_phs">
+    <xsl:param name="prefix">mods_</xsl:param>
+    <xsl:param name="suffix"/>
+    
+    <xsl:apply-templates mode="slurping_MODS_phs">
+      <xsl:with-param name="prefix" select="$prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+    </xsl:apply-templates>
+  </xsl:template>
+  
   <xsl:template mode="slurping_MODS_phs" match="mods:name">
-    <xsl:param name="prefix">mods</xsl:param>
-    <xsl:param name="suffix">ms</xsl:param>
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
     <xsl:if test="not(normalize-space(mods:namePart[1])='')">
       <xsl:variable name="field_name">
         <xsl:choose>
-          <xsl:when test="name(..) = 'subject'">_subject_name_phs_</xsl:when>
-          <xsl:otherwise>_name_role_phs_</xsl:otherwise>
+          <xsl:when test="name(..) = 'subject'">subject_name_phs_</xsl:when>
+          <xsl:otherwise>name_role_phs_</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="name_value">
@@ -69,14 +79,14 @@
   </xsl:template>
   
   <xsl:template mode="slurping_MODS_phs" match="mods:relatedItem[(normalize-space(@displayLabel) = 'Finding Aid' or normalize-space(@displayLabel) = 'Catalog Record') and @type='host']">
-    <xsl:param name="prefix">mods</xsl:param>
-    <xsl:param name="suffix">ms</xsl:param>
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
     <xsl:for-each select="mods:titleInfo/mods:title">
       <xsl:if test="not(normalize-space(.)='')">
         <xsl:variable name="this_prefix">
-          <xsl:value-of select="concat($prefix, '_relatedItem_title_phs_')"/>
+          <xsl:value-of select="concat($prefix, 'relatedItem_title_phs_')"/>
         </xsl:variable>
         <xsl:call-template name="general_mods_field">
           <xsl:with-param name="prefix" select="$this_prefix"/>
@@ -92,7 +102,7 @@
     <xsl:for-each select="mods:location/mods:url">     
       <xsl:if test="not(normalize-space(.)='')">
         <xsl:variable name="this_prefix">
-          <xsl:value-of select="concat($prefix, '_relatedItem_url_phs_')"/>
+          <xsl:value-of select="concat($prefix, 'relatedItem_url_phs_')"/>
         </xsl:variable>
         <xsl:call-template name="general_mods_field">
           <xsl:with-param name="prefix" select="$this_prefix"/>
