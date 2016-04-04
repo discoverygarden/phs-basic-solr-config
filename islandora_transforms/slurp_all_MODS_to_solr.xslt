@@ -37,6 +37,7 @@
     </xsl:apply-templates>
   </xsl:template>
   
+  <!-- PHS custom context building -->
   <xsl:template match="*" mode="slurping_MODS_phs">
     <xsl:param name="prefix">mods_</xsl:param>
     <xsl:param name="suffix"/>
@@ -47,6 +48,7 @@
     </xsl:apply-templates>
   </xsl:template>
   
+  <!-- PHS Custom name field for name/namePart and role/roleTerm -->
   <xsl:template mode="slurping_MODS_phs" match="mods:name">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
@@ -77,7 +79,7 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+  <!-- PHS custom relatedItem fields for titleinfo/title and location/url -->
   <xsl:template mode="slurping_MODS_phs" match="mods:relatedItem[(normalize-space(@displayLabel) = 'Finding Aid' or normalize-space(@displayLabel) = 'Catalog Record') and @type='host']">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
