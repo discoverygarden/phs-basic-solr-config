@@ -39,11 +39,13 @@
   
   <!-- PHS custom context building -->
   <xsl:template match="*" mode="slurping_MODS_phs">
-    <xsl:param name="prefix">mods_</xsl:param>
+    <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
-    
+    <xsl:variable name="this_prefix">                                                                                                                 
+      <xsl:value-of select="concat($prefix, 'mods_')"/>                                                                                           
+    </xsl:variable> 
     <xsl:apply-templates mode="slurping_MODS_phs">
-      <xsl:with-param name="prefix" select="$prefix"/>
+      <xsl:with-param name="prefix" select="$this_prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>
     </xsl:apply-templates>
   </xsl:template>
