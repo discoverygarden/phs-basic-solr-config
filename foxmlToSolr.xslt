@@ -109,6 +109,10 @@
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/slurp_all_chemicalML_to_solr.xslt"/>
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/traverse-graph.xslt"/>
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/hierarchy.xslt"/>
+  <!-- begin: islandora_solution_pack_oralhistories setup -->
+  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/or_transcript_solr.xslt"/>
+  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/vtt_solr.xslt"/>
+  <!-- end: islandora_solution_pack_oralhistories setup -->
 
   <!-- Decide which objects to modify the index of -->
   <xsl:template match="/">
@@ -224,6 +228,7 @@
                handle the mimetypes supported by the "getDatastreamText" call:
                https://github.com/fcrepo/gsearch/blob/master/FedoraGenericSearch/src/java/dk/defxws/fedoragsearch/server/TransformerToText.java#L185-L200
           -->
+
           <xsl:when test="@CONTROL_GROUP='M' and foxml:datastreamVersion[last() and not(starts-with(@MIMETYPE, 'image') or starts-with(@MIMETYPE, 'audio') or starts-with(@MIMETYPE, 'video') or @MIMETYPE = 'application/pdf')]">
             <!-- TODO: should do something about mime type filtering
               text/plain should use the getDatastreamText extension because document will only work for xml docs
@@ -259,7 +264,7 @@
         reindexing all the descendents whenever indexing an object
         (updating a collection label would be fairly expensive if we blindly
         reindexed). -->
-      
+
       <xsl:variable name="ancestors">
         <xsl:call-template name="get-ancestors">
           <xsl:with-param name="PID" select="$PID" />
