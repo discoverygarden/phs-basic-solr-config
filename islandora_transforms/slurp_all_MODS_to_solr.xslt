@@ -59,14 +59,15 @@
     <xsl:if test="not(normalize-space(mods:namePart[1])='')">
       <xsl:variable name="field_name">
         <xsl:choose>
-          <xsl:when test="name(..) = 'subject'">subject_name_phs_</xsl:when>
+          <xsl:when test="name(..) = 'subject'">name_phs_</xsl:when>
           <xsl:otherwise>name_role_phs_</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="name_value">
         <xsl:value-of select="normalize-space(mods:namePart[1])"/>
-        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'"
-          > (<xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>)</xsl:if>
+        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'">
+          (<xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>)
+        </xsl:if>
       </xsl:variable>
       <xsl:variable name="this_prefix">
         <xsl:value-of select="concat($prefix, $field_name)"/>
