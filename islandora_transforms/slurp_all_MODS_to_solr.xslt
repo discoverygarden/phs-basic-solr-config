@@ -65,9 +65,8 @@
       </xsl:variable>
       <xsl:variable name="name_value">
         <xsl:value-of select="normalize-space(mods:namePart[1])"/>
-        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'">
-          (<xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>)
-        </xsl:if>
+        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'"
+          > (<xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>)</xsl:if>
       </xsl:variable>
       <xsl:variable name="this_prefix">
         <xsl:value-of select="concat($prefix, $field_name)"/>
