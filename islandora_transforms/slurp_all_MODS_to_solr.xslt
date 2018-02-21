@@ -28,7 +28,7 @@
       <xsl:with-param name="pid" select="../../@PID"/>
       <xsl:with-param name="datastream" select="../@ID"/>
     </xsl:apply-templates>
-    
+
     <xsl:apply-templates mode="slurping_MODS_phs" select="$content//mods:mods[1]">
       <xsl:with-param name="prefix" select="$prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>
@@ -36,20 +36,20 @@
       <xsl:with-param name="datastream" select="../@ID"/>
     </xsl:apply-templates>
   </xsl:template>
-  
+
   <!-- PHS custom context building -->
   <xsl:template match="*" mode="slurping_MODS_phs">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
-    <xsl:variable name="this_prefix">                                                                                                                 
-      <xsl:value-of select="concat($prefix, 'mods_')"/>                                                                                           
-    </xsl:variable> 
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, local-name(), '_')"/>
+    </xsl:variable>
     <xsl:apply-templates mode="slurping_MODS_phs">
       <xsl:with-param name="prefix" select="$this_prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>
     </xsl:apply-templates>
   </xsl:template>
-  
+
   <!-- PHS Custom name field for name/namePart and role/roleTerm -->
   <xsl:template mode="slurping_MODS_phs" match="mods:name">
     <xsl:param name="prefix"/>
@@ -59,7 +59,7 @@
     <xsl:if test="not(normalize-space(mods:namePart[1])='')">
       <xsl:variable name="field_name">
         <xsl:choose>
-          <xsl:when test="name(..) = 'subject'">subject_name_phs_</xsl:when>
+          <xsl:when test="name(..) = 'subject'">name_phs_</xsl:when>
           <xsl:otherwise>name_role_phs_</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -102,8 +102,8 @@
         </xsl:call-template>
       </xsl:if>
     </xsl:for-each>
-    
-    <xsl:for-each select="mods:location/mods:url">     
+
+    <xsl:for-each select="mods:location/mods:url">
       <xsl:if test="not(normalize-space(.)='')">
         <xsl:variable name="this_prefix">
           <xsl:value-of select="concat($prefix, 'relatedItem_url_phs_')"/>
