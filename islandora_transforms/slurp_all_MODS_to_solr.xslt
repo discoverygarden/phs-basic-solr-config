@@ -158,7 +158,7 @@
   </xsl:template>
 
   <!-- Custom use and reproduction field -->
-  <xsl:template mode="slurping_MODS_phs" match="mods:accessCondition[normalize-space(@type) = 'use and reproduction']">
+  <xsl:template mode="slurping_MODS_phs" match="mods:accessCondition[normalize-space(@type) = 'use and reproduction' and not(normalize-space(@xlink:href)='')]">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
