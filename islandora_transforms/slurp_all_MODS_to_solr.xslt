@@ -120,6 +120,64 @@
     </xsl:for-each>
   </xsl:template>
 
+  <!-- Custom url fields -->
+  <xsl:template mode="slurping_MODS_phs" match="mods:relatedItem">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:for-each select="mods:location/mods:url">
+      <!-- Custom 'Archived site' field -->
+      <xsl:if test="normalize-space(@displayLabel)='Archived site'">
+        <xsl:variable name="this_prefix">
+          <xsl:value-of select="concat($prefix, 'url_archived_site_phs_')"/>
+        </xsl:variable>
+        <xsl:call-template name="general_mods_field">
+          <xsl:with-param name="prefix" select="$this_prefix"/>
+          <xsl:with-param name="suffix" select="$suffix"/>
+          <xsl:with-param name="value" select="normalize-space(.)"/>
+          <xsl:with-param name="pid" select="$pid"/>
+          <xsl:with-param name="datastream" select="$datastream"/>
+        </xsl:call-template>
+      </xsl:if>
+      <!-- Custom 'Active site' field -->
+      <xsl:if test="normalize-space(@displayLabel)='Active site'">
+        <xsl:variable name="this_prefix">
+          <xsl:value-of select="concat($prefix, 'url_active_site_phs_')"/>
+        </xsl:variable>
+        <xsl:call-template name="general_mods_field">
+          <xsl:with-param name="prefix" select="$this_prefix"/>
+          <xsl:with-param name="suffix" select="$suffix"/>
+          <xsl:with-param name="value" select="normalize-space(.)"/>
+          <xsl:with-param name="pid" select="$pid"/>
+          <xsl:with-param name="datastream" select="$datastream"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- Custom use and reproduction field -->
+  <xsl:template mode="slurping_MODS_phs" match="mods:accessCondition[normalize-space(@type) = 'use and reproduction']">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'accessCondition_use_and_reproduction_phs_')"/>
+    </xsl:variable>
+    <xsl:variable name="this_value">
+      <xsl:value-of select="concat(normalize-space(.), '; ', normalize-space(@xlink:href))"/>
+    </xsl:variable>
+    <xsl:call-template name="general_mods_field">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$this_value"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- Handle dates. -->
   <xsl:template match="mods:*[(@type='date') or (contains(translate(local-name(), 'D', 'd'), 'date'))][normalize-space(text())]" mode="slurping_MODS">
     <xsl:param name="prefix"/>
