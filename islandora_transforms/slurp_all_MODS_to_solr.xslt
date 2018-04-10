@@ -121,13 +121,13 @@
   </xsl:template>
 
   <!-- Custom url fields -->
-  <xsl:template mode="slurping_MODS_phs" match="mods:relatedItem">
+  <xsl:template mode="slurping_MODS_phs" match="mods:location">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
 
-    <xsl:for-each select="mods:location/mods:url">
+    <xsl:for-each select="mods:url">
       <!-- Custom 'Archived site' field -->
       <xsl:if test="normalize-space(@displayLabel)='Archived site'">
         <xsl:variable name="this_prefix">
