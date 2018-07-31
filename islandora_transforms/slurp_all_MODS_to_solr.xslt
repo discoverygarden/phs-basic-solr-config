@@ -14,17 +14,6 @@
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
 
-  <xsl:template match="//mods:mods">
-    <fields>
-      <xsl:apply-templates mode="slurping_MODS" select=".">
-        <xsl:with-param name="suffix" select="'ms'"/>
-      </xsl:apply-templates>
-
-      <xsl:apply-templates mode="slurping_MODS_phs" select=".">
-        <xsl:with-param name="suffix" select="'ms'"/>
-      </xsl:apply-templates>
-    </fields>
-  </xsl:template>
 
   <xsl:template match="foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]" name="index_MODS">
     <xsl:param name="content"/>
