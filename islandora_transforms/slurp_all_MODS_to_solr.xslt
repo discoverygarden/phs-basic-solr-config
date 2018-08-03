@@ -77,6 +77,13 @@
           <xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>
           <xsl:text>)</xsl:text>
         </xsl:if>
+        <xsl:if test="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+          <xsl:text>--</xsl:text>
+          <xsl:for-each select="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+            <xsl:value-of select="normalize-space(.)"/>
+            <xsl:if test="position()!=last()">--</xsl:if>
+          </xsl:for-each>
+        </xsl:if>
       </xsl:variable>
       <xsl:variable name="this_prefix">
         <xsl:value-of select="concat($prefix, $field_name)"/>
@@ -188,6 +195,16 @@
     </xsl:call-template>
   </xsl:template>
 
+  <!-- Custom subject/name -->
+  <xsl:template match="mods:subject[local-name(*[1])='name']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <!-- supress subfields of name subject -->
+  </xsl:template>
+  
   <!-- Custom subject/topic -->
   <xsl:template match="mods:subject[local-name(*[1])='topic']" mode="slurping_MODS">
     <xsl:param name="prefix"/>
