@@ -180,6 +180,7 @@
     <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
+
     <xsl:variable name="this_prefix">
       <xsl:value-of select="concat($prefix, 'accessCondition_use_and_reproduction_phs_')"/>
     </xsl:variable>
@@ -193,6 +194,21 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'accessCondition_use_and_reproduction_uri_phs_')"/>
+    </xsl:variable>
+    <xsl:variable name="this_value">
+      <xsl:value-of select="normalize-space(@xlink:href)"/>
+    </xsl:variable>
+    <xsl:call-template name="general_mods_field">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$this_value"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
   </xsl:template>
 
   <!-- Custom subject/name -->
