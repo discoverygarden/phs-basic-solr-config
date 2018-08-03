@@ -14,6 +14,7 @@
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
 
+
   <xsl:template match="foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]" name="index_MODS">
     <xsl:param name="content"/>
     <xsl:param name="prefix"></xsl:param>
@@ -64,9 +65,25 @@
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="name_value">
-        <xsl:value-of select="normalize-space(mods:namePart[1])"/>
-        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'"
-          > (<xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>)</xsl:if>
+        <xsl:for-each select="mods:namePart[normalize-space()!='']">
+          <xsl:value-of select="normalize-space(.)"/>
+          <xsl:if test="position()!=last()">
+            <xsl:text>, </xsl:text>
+          </xsl:if>
+        </xsl:for-each>
+        <!-- <xsl:value-of select="normalize-space(mods:namePart[1])"/> -->
+        <xsl:if test="not(normalize-space(mods:role[1]/mods:roleTerm)='') and name(..) != 'subject'">
+          <xsl:text> (</xsl:text>
+          <xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>
+          <xsl:text>)</xsl:text>
+        </xsl:if>
+        <xsl:if test="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+          <xsl:text>--</xsl:text>
+          <xsl:for-each select="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+            <xsl:value-of select="normalize-space(.)"/>
+            <xsl:if test="position()!=last()">--</xsl:if>
+          </xsl:for-each>
+        </xsl:if>
       </xsl:variable>
       <xsl:variable name="this_prefix">
         <xsl:value-of select="concat($prefix, $field_name)"/>
@@ -163,6 +180,7 @@
     <xsl:param name="suffix"/>
     <xsl:param name="pid">not provided</xsl:param>
     <xsl:param name="datastream">not provided</xsl:param>
+
     <xsl:variable name="this_prefix">
       <xsl:value-of select="concat($prefix, 'accessCondition_use_and_reproduction_phs_')"/>
     </xsl:variable>
@@ -176,6 +194,195 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'accessCondition_use_and_reproduction_uri_phs_')"/>
+    </xsl:variable>
+    <xsl:variable name="this_value">
+      <xsl:value-of select="normalize-space(@xlink:href)"/>
+    </xsl:variable>
+    <xsl:call-template name="general_mods_field">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$this_value"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+  </xsl:template>
+
+  <!-- Custom subject/name -->
+  <xsl:template match="mods:subject[local-name(*[1])='name']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <!-- supress subfields of name subject -->
+  </xsl:template>
+  
+  <!-- Custom subject/topic -->
+  <xsl:template match="mods:subject[local-name(*[1])='topic']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:variable name="subj">
+      <xsl:for-each select="mods:topic[normalize-space()!=''] | mods:geographic[normalize-space()!=''] | mods:temporal[normalize-space()!=''] | mods:occupation[normalize-space()!=''] | mods:genre[normalize-space()!=''] | mods:name[normalize-space()!='']">
+        <xsl:value-of select="normalize-space(.)"/>
+        <xsl:if test="position()!=last()">--</xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'subject_topic_')"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space($subj)"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+    <!--
+		<xsl:variable name="firstsubj">
+      <xsl:value-of select="normalize-space(mods:topic[1])"/>
+		</xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$firstsubj"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+    -->
+  </xsl:template>
+
+  <!-- Custom subject/geographic -->
+  <xsl:template match="mods:subject[local-name(*[1])='geographic']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:variable name="subj">
+      <xsl:for-each select="mods:topic[normalize-space()!=''] | mods:geographic[normalize-space()!=''] | mods:temporal[normalize-space()!=''] | mods:occupation[normalize-space()!=''] | mods:genre[normalize-space()!=''] | mods:name[normalize-space()!='']">
+        <xsl:value-of select="normalize-space(.)"/>
+        <xsl:if test="position()!=last()">--</xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'subject_geographic_')"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space($subj)"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+    <!--
+    <xsl:variable name="firstsubj">
+      <xsl:value-of select="normalize-space(mods:geographic[1])"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$firstsubj"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+    -->
+  </xsl:template>
+
+  <!-- Custom subject/temporal -->
+  <xsl:template match="mods:subject[local-name(*[1])='temporal']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:variable name="subj">
+      <xsl:for-each select="mods:topic[normalize-space()!=''] | mods:geographic[normalize-space()!=''] | mods:temporal[normalize-space()!=''] | mods:occupation[normalize-space()!=''] | mods:genre[normalize-space()!=''] | mods:name[normalize-space()!='']">
+        <xsl:value-of select="normalize-space(.)"/>
+        <xsl:if test="position()!=last()">--</xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'subject_temporal_')"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space($subj)"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+    <!--
+    <xsl:variable name="firstsubj">
+      <xsl:value-of select="normalize-space(mods:temporal[1])"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$firstsubj"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+    -->
+  </xsl:template>
+
+  <!-- Custom subject/genre -->
+  <xsl:template match="mods:subject[local-name(*[1])='genre']" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+
+    <xsl:variable name="subj">
+      <xsl:for-each select="mods:topic[normalize-space()!=''] | mods:geographic[normalize-space()!=''] | mods:temporal[normalize-space()!=''] | mods:occupation[normalize-space()!=''] | mods:genre[normalize-space()!=''] | mods:name[normalize-space()!='']">
+        <xsl:value-of select="normalize-space(.)"/>
+        <xsl:if test="position()!=last()">--</xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="this_prefix">
+      <xsl:value-of select="concat($prefix, 'subject_genre_')"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space($subj)"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+    <!--
+    <xsl:variable name="firstsubj">
+      <xsl:value-of select="normalize-space(mods:genre[1])"/>
+    </xsl:variable>
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$firstsubj"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+    -->
   </xsl:template>
 
   <!-- Handle dates. -->
@@ -455,5 +662,26 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template name="chopPunctuation">
+    <xsl:param name="chopString"/>
+    <xsl:param name="punctuation">
+      <xsl:text>.:,;/ </xsl:text>
+    </xsl:param>
+    <xsl:variable name="length" select="string-length($chopString)"/>
+    <xsl:choose>
+      <xsl:when test="$length=0"/>
+      <xsl:when test="contains($punctuation, substring($chopString,$length,1))">
+        <xsl:call-template name="chopPunctuation">
+          <xsl:with-param name="chopString" select="substring($chopString,1,$length - 1)"/>
+          <xsl:with-param name="punctuation" select="$punctuation"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="not($chopString)"/>
+      <xsl:otherwise>
+        <xsl:value-of select="$chopString"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
