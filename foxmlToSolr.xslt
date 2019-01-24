@@ -40,12 +40,17 @@
 
   <!--
     Parameter(s) from custom_parameters.properties.
+
+    XXX: PHS is using a dated version of FGS with no plans on updating, so let's
+    just switch the defaults values...
   -->
-  <xsl:param name="index_ancestors" select="false()"/>
+  <!-- Changed index_ancestors default to true. -->
+  <xsl:param name="index_ancestors" select="true()"/>
   <xsl:param name="index_ancestors_models" select="false()"/>
   <xsl:param name="maintain_dataset_latest_version_flag" select="false()"/>
-  <xsl:param name="index_compound_sequence" select="true()"/>
-  <xsl:param name="index_checksums" select="false()"/>
+  <!-- Changed index_compound_sequence default to false. -->
+  <xsl:param name="index_compound_sequence" select="false()"/>
+  <xsl:param name="index_checksums" select="true()"/>
 
   <!-- These values are accessible in included xslts -->
   <xsl:variable name="PROT">http</xsl:variable>
