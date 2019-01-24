@@ -741,4 +741,25 @@
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:apply-templates>
   </xsl:template>
+
+  <xsl:template name="chopPunctuation">
+    <xsl:param name="chopString"/>
+    <xsl:param name="punctuation">
+      <xsl:text>.:,;/ </xsl:text>
+    </xsl:param>
+    <xsl:variable name="length" select="string-length($chopString)"/>
+    <xsl:choose>
+      <xsl:when test="$length=0"/>
+      <xsl:when test="contains($punctuation, substring($chopString,$length,1))">
+        <xsl:call-template name="chopPunctuation">
+          <xsl:with-param name="chopString" select="substring($chopString,1,$length - 1)"/>
+          <xsl:with-param name="punctuation" select="$punctuation"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="not($chopString)"/>
+      <xsl:otherwise>
+        <xsl:value-of select="$chopString"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
