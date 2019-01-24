@@ -7,13 +7,12 @@
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xlink="http://www.w3.org/1999/xlink"
      exclude-result-prefixes="mods java xlink">
-  <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>-->
-  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/> -->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/>
+  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/slurp_MODS_fields_with_ALL_suffix_to_solr.xslt"/>
+
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
-
 
   <xsl:template match="foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]" name="index_MODS">
     <xsl:param name="content"/>
@@ -36,6 +35,7 @@
       <xsl:with-param name="pid" select="../../@PID"/>
       <xsl:with-param name="datastream" select="../@ID"/>
     </xsl:apply-templates>
+    <xsl:apply-templates mode="slurp_all_suffix" select="$content//mods:mods[1]"/>
   </xsl:template>
 
   <!-- PHS custom context building -->
@@ -77,12 +77,14 @@
           <xsl:value-of select="normalize-space(mods:role[1]/mods:roleTerm)"/>
           <xsl:text>)</xsl:text>
         </xsl:if>
-        <xsl:if test="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
-          <xsl:text>--</xsl:text>
-          <xsl:for-each select="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
-            <xsl:value-of select="normalize-space(.)"/>
-            <xsl:if test="position()!=last()">--</xsl:if>
-          </xsl:for-each>
+        <xsl:if test="name(..) = 'subject'">
+          <xsl:if test="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+            <xsl:text>--</xsl:text>
+            <xsl:for-each select="../mods:topic[normalize-space()!=''] | ../mods:geographic[normalize-space()!=''] | ../mods:temporal[normalize-space()!=''] | ../mods:occupation[normalize-space()!=''] | ../mods:genre[normalize-space()!='']">
+              <xsl:value-of select="normalize-space(.)"/>
+              <xsl:if test="position()!=last()">--</xsl:if>
+            </xsl:for-each>
+          </xsl:if>
         </xsl:if>
       </xsl:variable>
       <xsl:variable name="this_prefix">
@@ -220,7 +222,7 @@
 
     <!-- supress subfields of name subject -->
   </xsl:template>
-  
+
   <!-- Custom subject/topic -->
   <xsl:template match="mods:subject[local-name(*[1])='topic']" mode="slurping_MODS">
     <xsl:param name="prefix"/>
@@ -485,6 +487,27 @@
     </xsl:call-template>
   </xsl:template>
 
+  <!--
+    The "eventType" attribute was introduce with MODS 3.5... Let's start
+    exposing it for use.
+  -->
+  <xsl:template match="mods:originInfo" mode="slurping_MODS">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+    <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'" />
+    <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '" />
+
+    <xsl:call-template name="mods_eventType_fork">
+      <xsl:with-param name="prefix" select="concat($prefix, local-name(), '_')"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space(text())"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- Intercept names with role terms, so we can create copies of the fields
     including the role term in the name of generated fields. (Hurray, additional
     specificity!) -->
@@ -585,6 +608,38 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- Fork on eventType to preserve legacy field names. -->
+  <xsl:template name="mods_eventType_fork">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+    <xsl:param name="value"/>
+    <xsl:param name="pid">not provided</xsl:param>
+    <xsl:param name="datastream">not provided</xsl:param>
+    <xsl:param name="node" select="current()"/>
+    <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'" />
+    <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '" />
+
+    <xsl:call-template name="mods_language_fork">
+      <xsl:with-param name="prefix" select="$prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$value"/>
+      <xsl:with-param name="pid" select="$pid"/>
+      <xsl:with-param name="datastream" select="$datastream"/>
+      <xsl:with-param name="node" select="$node"/>
+    </xsl:call-template>
+
+    <xsl:if test="@eventType">
+      <xsl:call-template name="mods_language_fork">
+        <xsl:with-param name="prefix" select="concat($prefix, 'eventType_', translate(@eventType, $uppercase, $lowercase), '_')"/>
+        <xsl:with-param name="suffix" select="$suffix"/>
+        <xsl:with-param name="value" select="$value"/>
+        <xsl:with-param name="pid" select="$pid"/>
+        <xsl:with-param name="datastream" select="$datastream"/>
+        <xsl:with-param name="node" select="$node"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
   <!-- Want to include language in field names. -->
   <xsl:template name="mods_language_fork">
     <xsl:param name="prefix"/>
@@ -655,33 +710,35 @@
         <xsl:value-of select="$node/@authorityURI"/>
       </field>
     </xsl:if>
-
+    <xsl:if test="normalize-space($node/@valueURI)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'valueURI_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@valueURI"/>
+      </field>
+    </xsl:if>
+    <xsl:if test="normalize-space($node/@xlink:href)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'xlinkhref_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@xlink:href"/>
+      </field>
+    </xsl:if>
+    <xsl:if test="normalize-space($node/@displayLabel)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'displayLabel_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@displayLabel"/>
+      </field>
+    </xsl:if>
     <xsl:apply-templates select="$node/*" mode="slurping_MODS">
       <xsl:with-param name="prefix" select="$prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:apply-templates>
-  </xsl:template>
-
-  <xsl:template name="chopPunctuation">
-    <xsl:param name="chopString"/>
-    <xsl:param name="punctuation">
-      <xsl:text>.:,;/ </xsl:text>
-    </xsl:param>
-    <xsl:variable name="length" select="string-length($chopString)"/>
-    <xsl:choose>
-      <xsl:when test="$length=0"/>
-      <xsl:when test="contains($punctuation, substring($chopString,$length,1))">
-        <xsl:call-template name="chopPunctuation">
-          <xsl:with-param name="chopString" select="substring($chopString,1,$length - 1)"/>
-          <xsl:with-param name="punctuation" select="$punctuation"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="not($chopString)"/>
-      <xsl:otherwise>
-        <xsl:value-of select="$chopString"/>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
