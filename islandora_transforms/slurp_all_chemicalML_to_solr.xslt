@@ -746,7 +746,7 @@
         </xsl:attribute>
         <xsl:value-of select="$textValue"/>
       </field>
-      <!-- Fields are duplicated for authority because searches across authorities are common. -->
+      <!-- Fields are duplicated for authority because searches across authorities are common. --> 
       <xsl:if test="@authority">
         <field>
           <xsl:attribute name="name">
